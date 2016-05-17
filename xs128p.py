@@ -2,7 +2,7 @@ import sys
 import math
 import struct
 import random
-sys.path.append('/path/to/z3/build/')
+sys.path.append('/home/dgoddard/tools/z3/build/')
 from z3 import *
 
 # xor_shift_128_plus algorithm
@@ -90,7 +90,7 @@ def power_ball(generated, browser):
 # Firefox nextDouble():
     # (rand_uint64 & ((1 << 53) - 1)) / (1 << 53)
 # Chrome nextDouble():
-    # (rand_uint64 & ((1 << 52) - 1)) | 0x3FF0000000000000
+    # ((rand_uint64 & ((1 << 52) - 1)) | 0x3FF0000000000000) - 1.0
 # Safari weakRandom.get():
     # (rand_uint64 & ((1 << 53) - 1) * (1.0 / (1 << 53)))
 
@@ -102,7 +102,7 @@ def main():
     browser = 'chrome'
     # browser = 'firefox'
     print 'BROWSER: %s' % browser
-    
+
     # In your browser's JavaScript console:
     # _ = []; for(var i=0; i<5; ++i) { _.push(Math.random()) } ; console.log(_)
     # Enter at least 3 random numbers you observed here:

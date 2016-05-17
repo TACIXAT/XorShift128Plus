@@ -1,0 +1,17 @@
+For usage on the LA Time's powerball simulator. Careful about clicking the page.
+
+Run the following snippet in your browser's console.
+
+    _ = []; for(var i=0; i<5; ++i) { _.push(Math.random()) } ; console.log(_)
+
+Paste at least 3 of those values into the dubs array in main().
+
+Set the browser in main() to Chrome or Firefox. (Safari hasn't updated yet.)
+
+    python xs128p.py
+
+The winning numbers should have an arrow. Click once on the number inputs and tab between them to enter your "pick".
+
+Click once on the play button.
+
+Enjoy your lotto winnings :)
