@@ -2,7 +2,7 @@ import sys
 import math
 import struct
 import random
-sys.path.append('/home/dgoddard/tools/z3/build/')
+sys.path.append('/home/taxicat/prog/z3/build')
 from z3 import *
 
 # xor_shift_128_plus algorithm
@@ -41,6 +41,26 @@ def sym_xs128p(slvr, sym_state0, sym_state1, generated, browser):
     slvr.add(impl)
     return sym_state0, sym_state1, [condition]
 
+def reverse23(val):
+    bot46 = (val ^ (val << 23)) & 0x3fffffffffff
+    original = (val ^ (bot46 <<  23)) & 0xFFFFFFFFFFFFFFFF
+    return original
+
+def reverse17(val):
+    top34 = (val ^ (val >> 17)) & 0xFFFFFFFFC0000000
+    top51 = (val ^ (top34 >> 17)) & 0xFFFFFFFFFFFFE000
+    original = (val ^ (top51 >> 17))
+    return original
+
+def xs128p_backward(state0, state1):
+    prev_state1 = state0
+    prev_state0 = state1 ^ (state0 >> 26)
+    prev_state0 = prev_state0 ^ state0
+    prev_state0 = reverse17(prev_state0)
+    prev_state0 = reverse23(prev_state0)
+    generated = (prev_state0 + prev_state1) & 0xFFFFFFFFFFFFFFFF
+    return prev_state0, prev_state1, generated
+
 # Print 'last seen' random number
 #   and winning numbers following that.
 # This was for debugging. We know that Math.random()
@@ -73,7 +93,7 @@ def power_ball(generated, browser):
             nums.append(val)
 
         # print indicator
-        if idx == 4 and browser == 'chrome':
+        if idx == 0 and browser == 'chrome':
             print '--->',
         elif idx == 2 and browser == 'firefox':
             print '--->',
@@ -93,6 +113,16 @@ def power_ball(generated, browser):
     # ((rand_uint64 & ((1 << 52) - 1)) | 0x3FF0000000000000) - 1.0
 # Safari weakRandom.get():
     # (rand_uint64 & ((1 << 53) - 1) * (1.0 / (1 << 53)))
+def to_double(browser, out):
+    if browser == 'chrome':
+        double_bits = (out & 0xFFFFFFFFFFFFF) | 0x3FF0000000000000
+        double = struct.unpack('d', struct.pack('<Q', double_bits))[0] - 1
+    elif browser == 'firefox':
+        double = float(out & 0x1FFFFFFFFFFFFF) / (0x1 << 53) 
+    elif browser == 'safari':
+        double = float(out & 0x1FFFFFFFFFFFFF) * (1.0 / (0x1 << 53))
+    return double
+
 
 def main():
     # Note: 
@@ -105,8 +135,11 @@ def main():
 
     # In your browser's JavaScript console:
     # _ = []; for(var i=0; i<5; ++i) { _.push(Math.random()) } ; console.log(_)
-    # Enter at least 3 random numbers you observed here:
-    dubs = [ 0.8817331322829662, 0.31765120036119443, 0.3301985901101909 ]
+    # Enter at least the 3 first random numbers you observed here:
+    dubs = [0.4752549301773037, 0.08162196013326506, 0.8333085432653353]
+    if browser == 'chrome':
+        dubs = dubs[::-1]
+
     print dubs
 
     # from the doubles, generate known piece of the original uint64 
@@ -142,14 +175,12 @@ def main():
         generated = []
         # generate random numbers from recovered state
         for idx in xrange(15):
-            state0, state1, out = xs128p(state0, state1)
             if browser == 'chrome':
-                double_bits = (out & 0xFFFFFFFFFFFFF) | 0x3FF0000000000000
-                double = struct.unpack('d', struct.pack('<Q', double_bits))[0] - 1
-            elif browser == 'firefox':
-                double = float(out & 0x1FFFFFFFFFFFFF) / (0x1 << 53) 
-            elif browser == 'safari':
-                double = float(out & 0x1FFFFFFFFFFFFF) * (1.0 / (0x1 << 53))
+                state0, state1, out = xs128p_backward(state0, state1)
+            else:
+                state0, state1, out = xs128p(state0, state1)
+
+            double = to_double(browser, out)
             generated.append(double)
 
         # use generated numbers to predict powerball numbers
