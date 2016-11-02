@@ -2,7 +2,7 @@ import sys
 import math
 import struct
 import random
-sys.path.append('/home/taxicat/prog/z3/build')
+sys.path.append('/home/dgoddard/tools/z3/build')
 from z3 import *
 
 # xor_shift_128_plus algorithm
@@ -64,7 +64,7 @@ def xs128p_backward(state0, state1):
 # Print 'last seen' random number
 #   and winning numbers following that.
 # This was for debugging. We know that Math.random()
-#   is called in the browser twice for each page click 
+#   is called in the browser zero times (updated) for each page click 
 #   in Chrome and once for each page click in Firefox.
 #   Since we have to click once to enter the numbers
 #   and once for Play, we indicate the winning numbers
