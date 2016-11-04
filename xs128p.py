@@ -41,16 +41,11 @@ def sym_xs128p(slvr, sym_state0, sym_state1, generated, browser):
     slvr.add(impl)
     return sym_state0, sym_state1, [condition]
 
-def reverse23(val):
-    bot46 = (val ^ (val << 23)) & 0x3fffffffffff
-    original = (val ^ (bot46 <<  23)) & 0xFFFFFFFFFFFFFFFF
-    return original
-
 def reverse17(val):
-    top34 = (val ^ (val >> 17)) & 0xFFFFFFFFC0000000
-    top51 = (val ^ (top34 >> 17)) & 0xFFFFFFFFFFFFE000
-    original = (val ^ (top51 >> 17))
-    return original
+    return val ^ (val >> 17) ^ (val >> 34) ^ (val >> 51)
+
+def reverse23(val):
+    return (val ^ (val << 23) ^ (val << 46)) & 0xFFFFFFFFFFFFFFFF
 
 def xs128p_backward(state0, state1):
     prev_state1 = state0
