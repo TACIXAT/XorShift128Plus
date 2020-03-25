@@ -1,10 +1,14 @@
 For usage on the LA Time's powerball simulator. Careful about clicking the page.
 
+Blog post: https://blog.securityevaluators.com/hacking-the-javascript-lottery-80cc437e3b7f
+
 Run the following snippet in your browser's console.
 
     _ = []; for(var i=0; i<5; ++i) { _.push(Math.random()) } ; console.log(_)
 
-Paste at least 3 of those values into the dubs array in main().
+Paste at least 3 of those (5 for Chrome) values into the dubs array in main().
+
+It will warn you if the model is too "loose" and has multiple solutions.
 
 Set the browser in main() to Chrome or Firefox. (Safari hasn't updated yet.)
 
